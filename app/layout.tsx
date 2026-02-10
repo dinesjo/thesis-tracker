@@ -5,6 +5,9 @@ import { Toaster } from "sonner";
 export const metadata: Metadata = {
   title: "KTH Thesis Tracker",
   description: "Kanban + timeline + deliverables tracker for a master thesis project.",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({
