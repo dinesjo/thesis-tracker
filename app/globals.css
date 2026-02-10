@@ -1,0 +1,120 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --font-display: "Avenir Next Condensed", "Franklin Gothic Medium", "Helvetica Neue", sans-serif;
+  --font-body: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, serif;
+  --background: 210 35% 97%;
+  --foreground: 225 30% 14%;
+  --card: 0 0% 100%;
+  --muted: 210 25% 92%;
+  --muted-foreground: 215 15% 42%;
+  --border: 215 24% 84%;
+  --primary: 198 85% 35%;
+  --primary-foreground: 0 0% 100%;
+}
+
+.dark {
+  color-scheme: dark;
+  --background: 218 27% 10%;
+  --foreground: 210 30% 92%;
+  --card: 220 24% 14%;
+  --muted: 218 18% 22%;
+  --muted-foreground: 214 18% 72%;
+  --border: 218 17% 30%;
+  --primary: 194 74% 52%;
+  --primary-foreground: 220 40% 8%;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  min-height: 100vh;
+  color: hsl(var(--foreground));
+  background:
+    radial-gradient(circle at 10% 10%, rgba(26, 119, 167, 0.18), transparent 35%),
+    radial-gradient(circle at 90% 0%, rgba(11, 31, 52, 0.08), transparent 32%),
+    linear-gradient(160deg, #f8fbff 0%, #eef3fa 45%, #edf4fb 100%);
+}
+
+.dark body {
+  background:
+    radial-gradient(circle at 12% 12%, rgba(56, 189, 248, 0.18), transparent 36%),
+    radial-gradient(circle at 90% 0%, rgba(20, 29, 48, 0.22), transparent 42%),
+    linear-gradient(165deg, #090d16 0%, #0f1522 48%, #111a2d 100%);
+}
+
+.editorial-grid {
+  background-image:
+    linear-gradient(to right, rgba(122, 137, 166, 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(122, 137, 166, 0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.dark .editorial-grid {
+  background-image:
+    linear-gradient(to right, rgba(124, 142, 176, 0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(124, 142, 176, 0.1) 1px, transparent 1px);
+}
+
+.phase-band {
+  color: hsl(var(--foreground));
+  border-radius: 0.4rem;
+  padding: 0.15rem 0.45rem;
+  border: 1px solid rgba(19, 43, 78, 0.16);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.dark .phase-band {
+  border: 1px solid rgba(125, 211, 252, 0.22);
+  background: rgba(15, 23, 42, 0.78);
+}
+
+.timeline-gantt-shell {
+  position: relative;
+}
+
+.timeline-gantt .gantt-container {
+  min-height: 0;
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
+.timeline-gantt .popup-wrapper {
+  z-index: 40;
+}
+
+.bar-blocked .bar {
+  fill: #b91c1c !important;
+}
+
+.bar-default .bar {
+  fill: #1d799f !important;
+}
+
+.dark {
+  --g-arrow-color: #9fb2cf;
+  --g-bar-color: #38bdf8;
+  --g-bar-border: #0ea5e9;
+  --g-tick-color-thick: #273449;
+  --g-tick-color: #1e2a3b;
+  --g-actions-background: #182132;
+  --g-border-color: #223044;
+  --g-text-muted: #9aaecb;
+  --g-text-light: #e8f1ff;
+  --g-text-dark: #e5eefb;
+  --g-progress-color: #0e7490;
+  --g-handle-color: #c7d8f2;
+  --g-weekend-label-color: #2b3b57;
+  --g-expected-progress: #0f4c67;
+  --g-header-background: #101b2c;
+  --g-row-color: #0f1727;
+  --g-row-border-color: #2a3a52;
+  --g-today-highlight: #7dd3fc;
+  --g-popup-actions: #1d2a3f;
+  --g-weekend-highlight-color: #0f2032;
+}
