@@ -30,6 +30,12 @@ import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { STATUS_COLUMNS, type StatusColumn } from "@/lib/domain/constants";
+import { phaseBandStyle } from "@/lib/phase-colors";
+
+function formatDate(iso: string): string {
+  const date = new Date(iso + "T00:00:00");
+  return date.toLocaleDateString("en-SE", { month: "short", day: "numeric" });
+}
 
 type BoardPayload = {
   project: {
@@ -96,12 +102,14 @@ function findContainerByTaskId(columns: ColumnMap, taskId: string): StatusColumn
 function SortableTaskCard({
   task,
   phaseName,
+  phaseIndex,
   deliverableCount,
   onEdit,
   onDelete,
 }: {
   task: BoardPayload["tasks"][number];
   phaseName: string | undefined;
+  phaseIndex: number;
   deliverableCount: number;
   onEdit: (taskId: string) => void;
   onDelete: (taskId: string) => void;
@@ -157,10 +165,10 @@ function SortableTaskCard({
       </div>
       {task.description ? <p className="mt-1 text-xs text-muted-foreground line-clamp-2">{task.description}</p> : null}
       <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-muted-foreground">
-        <span className="phase-band">{phaseName ?? "No phase"}</span>
+        <span className="phase-band" style={phaseBandStyle(phaseIndex)}>{phaseName ?? "No phase"}</span>
         <span className="phase-band inline-flex items-center gap-1">
           <CalendarDays className="h-3 w-3" />
-          {task.startAt} - {task.endAt}
+          {formatDate(task.startAt)} – {formatDate(task.endAt)}
         </span>
         <span className="phase-band inline-flex items-center gap-1">
           <Link2 className="h-3 w-3" />
@@ -187,7 +195,7 @@ function Column({
   const { setNodeRef } = useDroppable({ id: status });
 
   return (
-    <Card className="min-h-[420px] bg-card/95">
+    <Card className="min-h-[280px] min-w-[220px] flex-1 bg-card/95">
       <CardHeader className="p-4 pb-2">
         <CardTitle className="flex items-center justify-between text-base">
           <span>{columnLabel[status]}</span>
@@ -203,6 +211,7 @@ function Column({
               key={task.id}
               task={task}
               phaseName={phases.find((phase) => phase.id === task.phaseId)?.name}
+              phaseIndex={phases.find((phase) => phase.id === task.phaseId)?.orderIndex ?? 0}
               deliverableCount={task.linkedDeliverableIds.length}
               onEdit={onEditTask}
               onDelete={onDeleteTask}
@@ -454,22 +463,28 @@ export function BoardClient({ initialData }: { initialData: BoardPayload }) {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap justify-end gap-2">
-        <Button
-          type="button"
-          variant={editingTask ? "outline" : "default"}
-          onClick={() => {
-            setEditingTaskId(null);
-            setCreating((v) => !v);
-          }}
-        >
-          {creating ? "Close" : "Quick create task"}
-        </Button>
-        {editingTask ? (
-          <Button type="button" variant="outline" onClick={() => setEditingTaskId(null)}>
-            Close edit
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-sm text-muted-foreground">
+          {allTasks.length} task{allTasks.length !== 1 ? "s" : ""} across {STATUS_COLUMNS.length} columns
+        </p>
+        <div className="flex gap-2">
+          {editingTask ? (
+            <Button type="button" size="sm" variant="outline" onClick={() => setEditingTaskId(null)}>
+              Close edit
+            </Button>
+          ) : null}
+          <Button
+            type="button"
+            size="sm"
+            variant={editingTask ? "outline" : "default"}
+            onClick={() => {
+              setEditingTaskId(null);
+              setCreating((v) => !v);
+            }}
+          >
+            {creating ? "Close" : "New task"}
           </Button>
-        ) : null}
+        </div>
       </div>
 
       {creating ? (
@@ -533,8 +548,13 @@ export function BoardClient({ initialData }: { initialData: BoardPayload }) {
                 <Label>Linked deliverables</Label>
                 <div className="mt-2 grid gap-2 rounded-md border border-border p-3 sm:grid-cols-2">
                   {initialData.deliverables.map((item) => (
-                    <label key={item.id} className="flex items-center gap-2 text-sm">
-                      <input type="checkbox" name="linkedDeliverableIds" value={item.id} />
+                    <label key={item.id} className="flex cursor-pointer items-center gap-2 text-sm">
+                      <input
+                        type="checkbox"
+                        name="linkedDeliverableIds"
+                        value={item.id}
+                        className="h-4 w-4 rounded border-border accent-primary"
+                      />
                       <span>{item.title}</span>
                     </label>
                   ))}
@@ -636,7 +656,7 @@ export function BoardClient({ initialData }: { initialData: BoardPayload }) {
           void onDragEnd(event);
         }}
       >
-        <div className="grid gap-4 xl:grid-cols-5">
+        <div className="flex gap-4 overflow-x-auto pb-2">
           {STATUS_COLUMNS.map((status) => (
             <Column
               key={status}

@@ -13,7 +13,7 @@ export default async function BoardPage() {
 
   return (
     <div className="space-y-4">
-      <header className="rounded-xl border border-border/80 bg-card/90 p-5 shadow-editorial backdrop-blur">
+      <header className="rounded-xl border border-border bg-card/90 p-5 shadow-editorial backdrop-blur">
         <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Kanban Board</p>
         <h2 className="font-[var(--font-display)] text-2xl text-foreground">Task Flow</h2>
       </header>

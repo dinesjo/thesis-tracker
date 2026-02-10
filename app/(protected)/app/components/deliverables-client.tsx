@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Link2, Plus } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { phaseColor } from "@/lib/phase-colors";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -40,6 +40,7 @@ type TaskItem = {
 type PhaseItem = {
   id: string;
   name: string;
+  orderIndex: number;
 };
 
 export function DeliverablesClient({
@@ -211,7 +212,7 @@ export function DeliverablesClient({
   }
 
   return (
-    <div className="grid gap-4 xl:grid-cols-[360px_1fr]">
+    <div className="grid gap-4 lg:grid-cols-[360px_1fr]">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
@@ -224,24 +225,39 @@ export function DeliverablesClient({
           <CardDescription>Preloaded milestones, fully editable.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-2">
-          {deliverables.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => setSelectedId(item.id)}
-              className={`w-full rounded-md border p-3 text-left transition ${
-                selectedId === item.id
-                  ? "border-primary bg-primary/10"
-                  : "border-border bg-card hover:bg-muted/60"
-              }`}
-            >
-              <p className="text-sm font-semibold text-foreground">{item.title}</p>
-              <p className="mt-1 text-xs text-muted-foreground">{DELIVERABLE_STATUS_LABELS[item.status]}</p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                {item.completedTaskCount}/{item.linkedTaskCount} linked tasks done
-              </p>
-            </button>
-          ))}
+          {deliverables.map((item) => {
+            const itemPhase = phases.find((p) => p.id === item.phaseId);
+            const pc = itemPhase ? phaseColor(itemPhase.orderIndex) : null;
+
+            return (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => setSelectedId(item.id)}
+                className={`w-full rounded-md border p-3 text-left transition ${
+                  selectedId === item.id
+                    ? "border-primary bg-primary/10"
+                    : "border-border bg-card hover:bg-muted/60"
+                }`}
+                style={pc ? { borderLeftWidth: 3, borderLeftColor: pc.fg } : undefined}
+              >
+                <p className="text-sm font-semibold text-foreground">{item.title}</p>
+                <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
+                  {itemPhase ? (
+                    <span className="inline-flex items-center gap-1">
+                      <span
+                        className="inline-block h-1.5 w-1.5 rounded-full"
+                        style={{ backgroundColor: pc?.fg }}
+                      />
+                      {itemPhase.name}
+                    </span>
+                  ) : null}
+                  <span>{DELIVERABLE_STATUS_LABELS[item.status]}</span>
+                  <span>{item.completedTaskCount}/{item.linkedTaskCount} done</span>
+                </div>
+              </button>
+            );
+          })}
 
           {isCreating ? (
             <form
@@ -395,30 +411,34 @@ export function DeliverablesClient({
                   {unlinkedTasks.length === 0 ? (
                     <p className="text-xs text-muted-foreground">All tasks are already linked.</p>
                   ) : (
-                    unlinkedTasks.slice(0, 12).map((task) => (
-                      <div key={task.id} className="flex items-center justify-between rounded bg-muted/55 p-2">
-                        <div>
-                          <p className="text-sm font-medium">{task.title}</p>
-                          <p className="text-xs text-muted-foreground">{STATUS_COLUMN_LABELS[task.statusColumn]}</p>
+                    <>
+                      {unlinkedTasks.slice(0, 12).map((task) => (
+                        <div key={task.id} className="flex items-center justify-between rounded bg-muted/55 p-2">
+                          <div>
+                            <p className="text-sm font-medium">{task.title}</p>
+                            <p className="text-xs text-muted-foreground">{STATUS_COLUMN_LABELS[task.statusColumn]}</p>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => void linkTask(task.id)}
+                            className="gap-1"
+                          >
+                            <Link2 className="h-3.5 w-3.5" />
+                            Link
+                          </Button>
                         </div>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => void linkTask(task.id)}
-                          className="gap-1"
-                        >
-                          <Link2 className="h-3.5 w-3.5" />
-                          Link
-                        </Button>
-                      </div>
-                    ))
+                      ))}
+                      {unlinkedTasks.length > 12 ? (
+                        <p className="pt-1 text-xs text-muted-foreground">
+                          +{unlinkedTasks.length - 12} more tasks not shown
+                        </p>
+                      ) : null}
+                    </>
                   )}
                 </div>
               </div>
 
-              <div className="rounded-md border border-border bg-muted/55 p-3 text-sm text-muted-foreground">
-                Progress: <Badge variant="outline">{selected.completedTaskCount}/{selected.linkedTaskCount} tasks done</Badge>
-              </div>
             </div>
           )}
         </CardContent>

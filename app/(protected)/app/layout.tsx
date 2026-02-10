@@ -20,9 +20,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="editorial-grid min-h-screen">
       <div className="mx-auto grid max-w-[1500px] grid-cols-1 gap-6 px-4 py-6 lg:grid-cols-[260px_1fr]">
-        <aside className="rounded-xl border border-border/90 bg-card/90 p-4 shadow-editorial backdrop-blur">
+        <aside className="self-start rounded-xl border border-border bg-sidebar p-4 shadow-editorial lg:sticky lg:top-6">
           <div className="mb-8">
             <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">KTH Master Thesis</p>
             <h1 className="mt-2 font-[var(--font-display)] text-xl font-semibold leading-tight text-foreground">

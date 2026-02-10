@@ -18,9 +18,10 @@ const config: Config = {
         primary: "hsl(var(--primary))",
         "primary-foreground": "hsl(var(--primary-foreground))",
         card: "hsl(var(--card))",
+        sidebar: "hsl(var(--sidebar))",
       },
       boxShadow: {
-        editorial: "0 20px 40px -24px rgba(20, 24, 38, 0.35)",
+        editorial: "var(--shadow-editorial)",
       },
       borderRadius: {
         lg: "0.85rem",

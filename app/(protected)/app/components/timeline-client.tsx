@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { STATUS_COLUMN_LABELS, type StatusColumn } from "@/lib/domain/constants";
+import { phaseColor } from "@/lib/phase-colors";
 
 type TimelineData = {
   phases: {
@@ -142,9 +143,8 @@ export function TimelineClient({ data }: { data: TimelineData }) {
 
   const phaseColorById = useMemo(() => {
     const map = new Map<string, string>();
-    sortedPhases.forEach((phase, index) => {
-      const hue = (195 + index * 28) % 360;
-      map.set(phase.id, `hsla(${hue}, 78%, 56%, 0.18)`);
+    sortedPhases.forEach((phase) => {
+      map.set(phase.id, phaseColor(phase.orderIndex).bg);
     });
     return map;
   }, [sortedPhases]);
@@ -164,8 +164,8 @@ export function TimelineClient({ data }: { data: TimelineData }) {
       return values;
     };
 
-    return sortedPhases.reduce<Record<string, string[]>>((acc, phase, index) => {
-      const color = phaseColorById.get(phase.id) ?? `hsla(${(210 + index * 24) % 360}, 78%, 56%, 0.18)`;
+    return sortedPhases.reduce<Record<string, string[]>>((acc, phase) => {
+      const color = phaseColorById.get(phase.id) ?? phaseColor(phase.orderIndex).bg;
       acc[color] = toDateStrings(phase.startDate, phase.endDate);
       return acc;
     }, {});
@@ -336,7 +336,7 @@ export function TimelineClient({ data }: { data: TimelineData }) {
     selectedTaskId === null ? null : data.tasks.find((task) => task.id === selectedTaskId) ?? null;
 
   return (
-    <div className="grid min-w-0 gap-4 xl:grid-cols-[1fr_320px]">
+    <div className="grid min-w-0 gap-4 lg:grid-cols-[1fr_320px]">
       <Card className="min-w-0">
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
@@ -420,11 +420,16 @@ export function TimelineClient({ data }: { data: TimelineData }) {
               <Badge
                 key={phase.id}
                 variant="outline"
-                className="gap-1"
+                className="gap-1.5"
                 style={{
-                  backgroundColor: phaseColorById.get(phase.id),
+                  backgroundColor: phaseColor(phase.orderIndex).bg,
+                  borderColor: phaseColor(phase.orderIndex).fg,
                 }}
               >
+                <span
+                  className="inline-block h-2 w-2 rounded-full"
+                  style={{ backgroundColor: phaseColor(phase.orderIndex).fg }}
+                />
                 {phase.name}
               </Badge>
             ))}
@@ -444,14 +449,16 @@ export function TimelineClient({ data }: { data: TimelineData }) {
           {selectedTask ? (
             <div className="space-y-3 text-sm">
               <h4 className="font-semibold text-foreground">{selectedTask.title}</h4>
-              <p className="text-muted-foreground">{selectedTask.description ?? "No description"}</p>
+              {selectedTask.description ? (
+                <p className="text-muted-foreground">{selectedTask.description}</p>
+              ) : null}
               <div className="flex flex-wrap gap-2">
                 <Badge variant="outline">{STATUS_COLUMN_LABELS[selectedTask.statusColumn]}</Badge>
                 <Badge>
                   {phaseById.get(selectedTask.phaseId)?.name ?? "No phase"}
                 </Badge>
                 <Badge variant="outline">
-                  {selectedTask.startAt} - {selectedTask.endAt}
+                  {new Date(selectedTask.startAt + "T00:00:00").toLocaleDateString("en-SE", { month: "short", day: "numeric" })} – {new Date(selectedTask.endAt + "T00:00:00").toLocaleDateString("en-SE", { month: "short", day: "numeric" })}
                 </Badge>
               </div>
             </div>

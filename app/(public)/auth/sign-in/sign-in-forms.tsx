@@ -57,7 +57,7 @@ export function SignInForms({
   );
 
   return (
-    <Card className="w-full max-w-lg border-border/80 bg-card/90 backdrop-blur">
+    <Card className="w-full max-w-lg border-border bg-card/90 backdrop-blur">
       <CardHeader>
         <CardTitle className="font-[var(--font-display)] text-3xl text-foreground">
           KTH Thesis Tracker
