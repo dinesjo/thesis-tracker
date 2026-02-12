@@ -61,3 +61,33 @@ export function SidebarNav() {
     </nav>
   );
 }
+
+export function MobileTopNav() {
+  const pathname = usePathname();
+
+  return (
+    <nav className="flex gap-2 overflow-x-auto pb-1">
+      {navItems.map((item) => {
+        const Icon = item.icon;
+        const active = isItemActive(pathname, item.href);
+
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            aria-current={active ? "page" : undefined}
+            className={cn(
+              "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs transition",
+              active
+                ? "border-primary/40 bg-primary/12 text-foreground"
+                : "border-border bg-card text-muted-foreground hover:text-foreground",
+            )}
+          >
+            <Icon className={cn("h-3.5 w-3.5", active ? "text-primary" : "text-muted-foreground")} />
+            <span className="font-medium">{item.label}</span>
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}

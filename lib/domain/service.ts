@@ -426,11 +426,59 @@ export async function updateTask(userId: string, taskId: string, input: UpdateTa
     patch.columnOrder = (maxOrder ?? -1) + 1;
   }
 
+  let validatedDeliverableIds: string[] | null = null;
+  if (input.linkedDeliverableIds !== undefined) {
+    const uniqueDeliverableIds = [...new Set(input.linkedDeliverableIds)];
+    validatedDeliverableIds = [];
+
+    if (uniqueDeliverableIds.length > 0) {
+      const validDeliverables = await db
+        .select({ id: deliverables.id })
+        .from(deliverables)
+        .where(
+          and(
+            eq(deliverables.projectId, project.id),
+            inArray(deliverables.id, uniqueDeliverableIds),
+          ),
+        );
+
+      if (validDeliverables.length !== uniqueDeliverableIds.length) {
+        throw new Error("One or more deliverables were not found");
+      }
+
+      validatedDeliverableIds = validDeliverables.map((deliverable) => deliverable.id);
+    }
+  }
+
   const [updated] = await db
     .update(tasks)
     .set(patch)
     .where(and(eq(tasks.id, taskId), eq(tasks.projectId, project.id)))
     .returning();
+
+  if (validatedDeliverableIds !== null) {
+    await db
+      .delete(taskDeliverables)
+      .where(
+        and(
+          eq(taskDeliverables.taskId, taskId),
+          sql`exists (
+            select 1 from ${tasks}
+            where ${tasks.id} = ${taskDeliverables.taskId}
+              and ${tasks.projectId} = ${project.id}
+          )`,
+        ),
+      );
+
+    if (validatedDeliverableIds.length > 0) {
+      await db.insert(taskDeliverables).values(
+        validatedDeliverableIds.map((deliverableId) => ({
+          taskId,
+          deliverableId,
+        })),
+      );
+    }
+  }
 
   return updated;
 }

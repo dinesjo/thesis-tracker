@@ -109,12 +109,46 @@ body {
   z-index: 40;
 }
 
-.bar-blocked .bar {
-  fill: #b91c1c !important;
+.timeline-gantt .bar-wrapper .bar,
+.timeline-gantt .bar-wrapper .bar-progress {
+  transition: fill 180ms ease, opacity 180ms ease;
 }
 
-.bar-default .bar {
+/* Done should recede visually so active work stands out first. */
+.timeline-gantt .bar-wrapper.bar-done .bar {
+  fill: hsl(var(--muted) / 0.95) !important;
+}
+
+.timeline-gantt .bar-wrapper.bar-done .bar-progress {
+  fill: hsl(var(--muted-foreground) / 0.4) !important;
+}
+
+.timeline-gantt .bar-wrapper.bar-done .bar-label {
+  fill: hsl(var(--muted-foreground)) !important;
+}
+
+.timeline-gantt .bar-wrapper.bar-in-progress .bar {
+  fill: hsl(var(--primary) / 0.4) !important;
+}
+
+.timeline-gantt .bar-wrapper.bar-in-progress .bar-progress {
   fill: hsl(var(--primary)) !important;
+}
+
+.timeline-gantt .bar-wrapper.bar-alert .bar {
+  fill: #fecaca !important;
+}
+
+.timeline-gantt .bar-wrapper.bar-alert .bar-progress {
+  fill: #ef4444 !important;
+}
+
+.timeline-gantt .bar-wrapper.bar-todo .bar {
+  fill: hsl(var(--muted) / 0.88) !important;
+}
+
+.timeline-gantt .bar-wrapper.bar-todo .bar-progress {
+  fill: #64748b !important;
 }
 
 .dark {

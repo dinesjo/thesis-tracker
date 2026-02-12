@@ -71,5 +71,7 @@ declare module "frappe-gantt" {
       },
     );
     change_view_mode(mode: string | ViewMode, maintain_pos?: boolean): void;
+    set_scroll_position(target: "today" | "start" | "end" | string): void;
+    scroll_current(): void;
   }
 }

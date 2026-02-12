@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Gantt, { type GanttTask } from "frappe-gantt";
 import { toast } from "sonner";
@@ -12,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { STATUS_COLUMN_LABELS, type StatusColumn } from "@/lib/domain/constants";
 import { phaseColor } from "@/lib/phase-colors";
+import { formatDateRange, isoDateInTimeZone } from "@/lib/date-utils";
 
 type TimelineData = {
   phases: {
@@ -44,6 +46,7 @@ export function TimelineClient({ data }: { data: TimelineData }) {
   const [viewMode, setViewMode] = useState<"Day" | "Week" | "Month">("Week");
   const [isEditingPhases, setIsEditingPhases] = useState(false);
   const [savingPhases, setSavingPhases] = useState(false);
+  const todayIso = useMemo(() => isoDateInTimeZone(new Date()), []);
 
   const phaseById = useMemo(() => new Map(data.phases.map((phase) => [phase.id, phase])), [data.phases]);
 
@@ -54,10 +57,24 @@ export function TimelineClient({ data }: { data: TimelineData }) {
         name: task.title,
         start: task.startAt,
         end: task.endAt,
-        progress: task.statusColumn === "done" ? 100 : task.statusColumn === "in_progress" ? 50 : 10,
-        custom_class: task.statusColumn === "blocked" ? "bar-blocked" : "bar-default",
+        progress:
+          task.statusColumn === "done"
+            ? 100
+            : task.statusColumn === "in_progress"
+              ? 65
+              : task.statusColumn === "blocked" || task.endAt < todayIso
+                ? 45
+                : 12,
+        custom_class:
+          task.statusColumn === "done"
+            ? "bar-done"
+            : task.statusColumn === "in_progress"
+              ? "bar-in-progress"
+              : task.statusColumn === "blocked" || task.endAt < todayIso
+                ? "bar-alert"
+                : "bar-todo",
       })),
-    [data.tasks],
+    [data.tasks, todayIso],
   );
 
   const sortedPhases = useMemo(() => {
@@ -66,7 +83,6 @@ export function TimelineClient({ data }: { data: TimelineData }) {
 
   const phaseWindowPadding = useMemo(() => {
     const dayMs = 24 * 60 * 60 * 1000;
-    const todayIso = new Date().toISOString().slice(0, 10);
     const firstPhaseStart = sortedPhases[0]?.startDate ?? todayIso;
     const lastPhaseEnd = sortedPhases[sortedPhases.length - 1]?.endDate ?? todayIso;
 
@@ -80,7 +96,7 @@ export function TimelineClient({ data }: { data: TimelineData }) {
     const endPadDays = Math.max(7, Math.ceil((toUtc(lastPhaseEnd) - toUtc(lastTaskEnd)) / dayMs) + 2);
 
     return [`${startPadDays}d`, `${endPadDays}d`] as [string, string];
-  }, [data.tasks, sortedPhases]);
+  }, [data.tasks, sortedPhases, todayIso]);
 
   const [phaseDrafts, setPhaseDrafts] = useState(() =>
     [...data.phases]
@@ -253,7 +269,33 @@ export function TimelineClient({ data }: { data: TimelineData }) {
     );
   }
 
+  function validatePhaseDrafts() {
+    for (let index = 0; index < phaseDrafts.length; index += 1) {
+      const phase = phaseDrafts[index];
+      if (!phase.name.trim()) {
+        return `Phase ${index + 1} name cannot be empty`;
+      }
+      if (phase.startDate > phase.endDate) {
+        return `Phase ${index + 1} start date must be on or before end date`;
+      }
+      if (index > 0) {
+        const previous = phaseDrafts[index - 1];
+        if (previous.endDate >= phase.startDate) {
+          return `Phase ${index + 1} must start after the previous phase`;
+        }
+      }
+    }
+
+    return null;
+  }
+
   async function savePhases() {
+    const validationError = validatePhaseDrafts();
+    if (validationError) {
+      toast.error(validationError);
+      return;
+    }
+
     setSavingPhases(true);
     try {
       const response = await fetch("/api/phases", {
@@ -301,7 +343,7 @@ export function TimelineClient({ data }: { data: TimelineData }) {
       container_height: containerHeight,
       infinite_padding: false,
       auto_move_label: true,
-      scroll_to: "start",
+      scroll_to: "today",
       popup_on: "click",
       popup: () => false,
       holidays: phaseHolidays,
@@ -323,7 +365,8 @@ export function TimelineClient({ data }: { data: TimelineData }) {
       return;
     }
 
-    ganttInstance.current.change_view_mode(viewMode, true);
+    ganttInstance.current.change_view_mode(viewMode, false);
+    ganttInstance.current.scroll_current();
   }, [viewMode]);
 
   useEffect(() => {
@@ -437,6 +480,24 @@ export function TimelineClient({ data }: { data: TimelineData }) {
           <div className="timeline-gantt-shell overflow-x-auto overflow-y-visible rounded-md border border-border bg-card p-3">
             <div ref={ganttRef} className="timeline-gantt w-full pb-4" />
           </div>
+          <div className="flex flex-wrap gap-2 text-xs">
+            <Badge variant="outline" className="gap-1 border-emerald-500/40 bg-emerald-500/10 text-foreground">
+              <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
+              Done
+            </Badge>
+            <Badge variant="outline" className="gap-1 border-primary/40 bg-primary/10 text-foreground">
+              <span className="inline-block h-2 w-2 rounded-full bg-primary" />
+              In progress
+            </Badge>
+            <Badge variant="outline" className="gap-1 border-red-500/40 bg-red-500/10 text-foreground">
+              <span className="inline-block h-2 w-2 rounded-full bg-red-500" />
+              Blocked / overdue
+            </Badge>
+            <Badge variant="outline" className="gap-1 border-slate-500/40 bg-slate-500/10 text-foreground">
+              <span className="inline-block h-2 w-2 rounded-full bg-slate-500" />
+              Todo / backlog
+            </Badge>
+          </div>
         </CardContent>
       </Card>
 
@@ -458,9 +519,12 @@ export function TimelineClient({ data }: { data: TimelineData }) {
                   {phaseById.get(selectedTask.phaseId)?.name ?? "No phase"}
                 </Badge>
                 <Badge variant="outline">
-                  {new Date(selectedTask.startAt + "T00:00:00").toLocaleDateString("en-SE", { month: "short", day: "numeric" })} – {new Date(selectedTask.endAt + "T00:00:00").toLocaleDateString("en-SE", { month: "short", day: "numeric" })}
+                  {formatDateRange(selectedTask.startAt, selectedTask.endAt)}
                 </Badge>
               </div>
+              <Button asChild size="sm" className="w-full">
+                <Link href={`/app/board?task=${selectedTask.id}`}>Open in board</Link>
+              </Button>
             </div>
           ) : (
             <p className="text-sm text-muted-foreground">Select a task bar from the timeline.</p>

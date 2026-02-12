@@ -32,6 +32,7 @@ export const updateTaskSchema = z.object({
   priority: prioritySchema.optional(),
   startAt: dateStringSchema.optional(),
   endAt: dateStringSchema.optional(),
+  linkedDeliverableIds: z.array(z.string().uuid()).optional(),
 });
 
 export const reorderTaskSchema = z.object({
