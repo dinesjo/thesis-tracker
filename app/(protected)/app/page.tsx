@@ -81,7 +81,7 @@ export default async function AppOverviewPage() {
         <Card>
           <CardContent className="p-4">
             <p className="text-xs uppercase tracking-[0.12em] text-muted-foreground">Completion</p>
-            <p className="mt-1 font-[var(--font-display)] text-3xl leading-none text-foreground">{totalPct}%</p>
+            <p className="mt-1 font-(--font-display) text-3xl leading-none text-foreground">{totalPct}%</p>
             <p className="mt-2 text-xs text-muted-foreground">
               {totalDone}/{timeline.tasks.length} tasks done
             </p>
@@ -90,21 +90,21 @@ export default async function AppOverviewPage() {
         <Card className={blockedTasks.length > 0 ? "border-red-500/40 bg-red-500/5" : ""}>
           <CardContent className="p-4">
             <p className="text-xs uppercase tracking-[0.12em] text-muted-foreground">Blocked Tasks</p>
-            <p className="mt-1 font-[var(--font-display)] text-3xl leading-none text-foreground">{blockedTasks.length}</p>
+            <p className="mt-1 font-(--font-display) text-3xl leading-none text-foreground">{blockedTasks.length}</p>
             <p className="mt-2 text-xs text-muted-foreground">Needs immediate action</p>
           </CardContent>
         </Card>
         <Card className={overdueDeliverables.length > 0 ? "border-red-500/40 bg-red-500/5" : ""}>
           <CardContent className="p-4">
             <p className="text-xs uppercase tracking-[0.12em] text-muted-foreground">Overdue Milestones</p>
-            <p className="mt-1 font-[var(--font-display)] text-3xl leading-none text-foreground">{overdueDeliverables.length}</p>
+            <p className="mt-1 font-(--font-display) text-3xl leading-none text-foreground">{overdueDeliverables.length}</p>
             <p className="mt-2 text-xs text-muted-foreground">Deliverables past due date</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
             <p className="text-xs uppercase tracking-[0.12em] text-muted-foreground">Due This Week</p>
-            <p className="mt-1 font-[var(--font-display)] text-3xl leading-none text-foreground">{dueSoonDeliverables.length}</p>
+            <p className="mt-1 font-(--font-display) text-3xl leading-none text-foreground">{dueSoonDeliverables.length}</p>
             <p className="mt-2 text-xs text-muted-foreground">Upcoming deliverables in 7 days</p>
           </CardContent>
         </Card>
@@ -135,7 +135,7 @@ export default async function AppOverviewPage() {
                 >
                   Current Phase
                 </p>
-                <p className="mt-0.5 font-[var(--font-display)] text-xl font-semibold text-foreground">
+                <p className="mt-0.5 font-(--font-display) text-xl text-foreground">
                   {phase.name}
                 </p>
               </div>
@@ -170,7 +170,7 @@ export default async function AppOverviewPage() {
             >
               <div>
                 <p className="text-xs text-muted-foreground">Tasks</p>
-                <p className="mt-0.5 font-[var(--font-display)] text-2xl font-semibold text-foreground">
+                <p className="mt-0.5 font-(--font-display) text-2xl text-foreground">
                   {phaseDone}
                   <span className="text-base font-normal text-muted-foreground">/{phaseTasks.length}</span>
                 </p>
@@ -178,7 +178,7 @@ export default async function AppOverviewPage() {
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">In progress</p>
-                <p className="mt-0.5 font-[var(--font-display)] text-2xl font-semibold text-foreground">
+                <p className="mt-0.5 font-(--font-display) text-2xl text-foreground">
                   {phaseInProgress}
                 </p>
                 {phaseBlocked > 0 ? (
@@ -189,7 +189,7 @@ export default async function AppOverviewPage() {
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Deliverables</p>
-                <p className="mt-0.5 font-[var(--font-display)] text-2xl font-semibold text-foreground">
+                <p className="mt-0.5 font-(--font-display) text-2xl text-foreground">
                   {phaseDelDone}
                   <span className="text-base font-normal text-muted-foreground">/{phaseDeliverables.length}</span>
                 </p>

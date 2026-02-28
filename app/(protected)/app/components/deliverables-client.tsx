@@ -128,6 +128,20 @@ export function DeliverablesClient({
     setDraft(toDraft(selected));
   }, [selected]);
 
+  const taskCountsByDeliverable = useMemo(() => {
+    const counts = new Map<string, { linked: number; completed: number }>();
+    tasks.forEach((task) => {
+      task.linkedDeliverableIds.forEach((deliverableId) => {
+        const curr = counts.get(deliverableId) ?? { linked: 0, completed: 0 };
+        counts.set(deliverableId, {
+          linked: curr.linked + 1,
+          completed: curr.completed + (task.statusColumn === "done" ? 1 : 0),
+        });
+      });
+    });
+    return counts;
+  }, [tasks]);
+
   const linkedTasks = useMemo(() => {
     if (!selected) return [];
     return tasks.filter((task) => task.linkedDeliverableIds.includes(selected.id));
@@ -330,6 +344,7 @@ export function DeliverablesClient({
             const pc = itemPhase ? phaseColor(itemPhase.orderIndex) : null;
             const days = item.dueDate ? daysUntilDate(item.dueDate) : null;
             const overdue = days !== null && days < 0 && item.status !== "done";
+            const taskCounts = taskCountsByDeliverable.get(item.id) ?? { linked: 0, completed: 0 };
 
             return (
               <button
@@ -353,7 +368,7 @@ export function DeliverablesClient({
                   ) : null}
                   <span>{DELIVERABLE_STATUS_LABELS[item.status]}</span>
                   <span>
-                    {item.completedTaskCount}/{item.linkedTaskCount} done
+                    {taskCounts.completed}/{taskCounts.linked} done
                   </span>
                   {item.dueDate ? (
                     <span className={overdue ? "font-medium text-red-500" : "text-muted-foreground"}>

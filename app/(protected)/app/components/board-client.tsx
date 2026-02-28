@@ -230,7 +230,7 @@ function Column({
   const { setNodeRef } = useDroppable({ id: status });
 
   return (
-    <Card className="min-h-[280px] min-w-[240px] flex-1 bg-card/95">
+    <Card className="min-h-70 min-w-60 flex-1 bg-card/95">
       <CardHeader className="p-4 pb-2">
         <CardTitle className="flex items-center justify-between text-base">
           <span>{columnLabel[status]}</span>
@@ -869,7 +869,7 @@ export function BoardClient({ initialData }: { initialData: BoardPayload }) {
 
         <DragOverlay>
           {activeTask ? (
-            <div className="w-[260px] rounded-md border border-border bg-card p-3 shadow-editorial">
+            <div className="w-65 rounded-md border border-border bg-card p-3 shadow-editorial">
               <p className="text-sm font-semibold text-foreground">{activeTask.title}</p>
               <p className="mt-1 text-xs text-muted-foreground">{phaseMap.get(activeTask.phaseId)?.name ?? "No phase"}</p>
               <p className="mt-1 text-xs text-muted-foreground">{formatDateRange(activeTask.startAt, activeTask.endAt)}</p>
