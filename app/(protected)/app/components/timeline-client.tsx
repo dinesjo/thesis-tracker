@@ -62,7 +62,7 @@ export function TimelineClient({ data }: { data: TimelineData }) {
             ? 100
             : task.statusColumn === "in_progress"
               ? 65
-              : task.statusColumn === "blocked" || (task.statusColumn !== "done" && task.endAt < todayIso)
+              : task.statusColumn === "blocked" || task.endAt < todayIso
                 ? 45
                 : 12,
         custom_class:
@@ -70,7 +70,7 @@ export function TimelineClient({ data }: { data: TimelineData }) {
             ? "bar-done"
             : task.statusColumn === "in_progress"
               ? "bar-in-progress"
-              : task.statusColumn === "blocked" || (task.statusColumn !== "done" && task.endAt < todayIso)
+              : task.statusColumn === "blocked" || task.endAt < todayIso
                 ? "bar-alert"
                 : "bar-todo",
       })),
