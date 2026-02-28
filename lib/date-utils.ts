@@ -59,7 +59,7 @@ export function daysUntilDate(
 }
 
 export function daysBetweenDates(startIso: string, endIso: string): number {
-  return Math.ceil((parseIsoDateToUtc(endIso) - parseIsoDateToUtc(startIso)) / DAY_MS);
+  return Math.round((parseIsoDateToUtc(endIso) - parseIsoDateToUtc(startIso)) / DAY_MS) + 1;
 }
 
 export function relativeDayLabel(days: number): string {

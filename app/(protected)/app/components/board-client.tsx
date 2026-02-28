@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -264,6 +264,7 @@ export function BoardClient({ initialData }: { initialData: BoardPayload }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [columns, setColumns] = useState<ColumnMap>(() => createColumnMap(initialData.tasks));
+  const preDragColumns = useRef<ColumnMap | null>(null);
   const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
@@ -347,6 +348,7 @@ export function BoardClient({ initialData }: { initialData: BoardPayload }) {
       toast.info("Clear filters to reorder tasks");
       return;
     }
+    preDragColumns.current = columns;
     setActiveTaskId(String(event.active.id));
   }
 
@@ -462,6 +464,7 @@ export function BoardClient({ initialData }: { initialData: BoardPayload }) {
       router.refresh();
     } catch {
       toast.error("Could not persist task order");
+      if (preDragColumns.current) setColumns(preDragColumns.current);
     }
   }
 

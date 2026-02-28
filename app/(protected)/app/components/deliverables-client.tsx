@@ -372,7 +372,10 @@ export function DeliverablesClient({
                   </span>
                   {item.dueDate ? (
                     <span className={overdue ? "font-medium text-red-500" : "text-muted-foreground"}>
-                      {formatShortDate(item.dueDate)} ({relativeDayLabel(days ?? 0)})
+                      {formatShortDate(item.dueDate)}
+                      {days !== null && (item.status !== "done" || days >= 0)
+                        ? ` (${relativeDayLabel(days)})`
+                        : null}
                     </span>
                   ) : null}
                 </div>

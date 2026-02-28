@@ -13,6 +13,7 @@ import {
   DEFAULT_TIMEZONE,
   type StatusColumn,
 } from "@/lib/domain/constants";
+import { isoDateInTimeZone } from "@/lib/date-utils";
 import { applyTaskReorder } from "@/lib/domain/reorder";
 import { buildSeedTemplate } from "@/lib/domain/bootstrap";
 import {
@@ -272,7 +273,7 @@ export async function getBoardData(userId: string) {
 
 export async function getTimelineData(userId: string) {
   const board = await getBoardData(userId);
-  const now = new Date().toISOString().slice(0, 10);
+  const now = isoDateInTimeZone(new Date());
 
   const currentPhase =
     board.phases.find((phase) => phase.startDate <= now && now <= phase.endDate) ?? null;

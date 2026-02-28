@@ -275,7 +275,7 @@ export default async function AppOverviewPage() {
                                 overdue ? "font-medium text-red-500" : "text-muted-foreground"
                               }`}
                             >
-                              {formatShortDate(item.dueDate)} {days !== null ? `(${relativeDayLabel(days)})` : ""}
+                              {formatShortDate(item.dueDate)}{days !== null && (item.status !== "done" || days >= 0) ? ` (${relativeDayLabel(days)})` : ""}
                             </span>
                           ) : null}
                         </div>
